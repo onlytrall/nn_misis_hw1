@@ -25,9 +25,9 @@ if __name__ ==  "__main__":
 
   config = {
     'lr' : 0.01,
-    'epochs' : 100,
-    'batch_size' : 256,
-    'weight_decay' : 0.01,
+    'epochs' : 20,
+    'batch_size' : 32,
+    'weight_decay' : 0.0,
     'seed' : 1,
   }
 
