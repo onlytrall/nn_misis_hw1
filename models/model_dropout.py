@@ -1,6 +1,16 @@
 import torch
 from torch import nn, Tensor
 
+from utils.mapping import (
+  _person_home_ownership_map,
+  _loan_intent_map,
+  _numeric_feaures,
+  _cb_person_default_on_file_map,
+  _loan_grade_map,
+)
+
+_NUMERICAL_FEATURES = len(_numeric_feaures)
+
 class Block(nn.Module):
   def __init__(self, hidden_size):
     super().__init__()
@@ -11,18 +21,15 @@ class Block(nn.Module):
     self.dropout = nn.Dropout(p=0.1)
     self.relu1 = nn.LeakyReLU()
     self.linear2 = nn.Linear(hidden_size * 4, hidden_size)
-    self.relu2 = nn.LeakyReLU()
 
   def forward(self, x):
     identity = x
 
     x = self.bn(x)
-    x = self.relu0(x)
     x = self.linear1(x)
     x = self.dropout(x)
     x = self.relu1(x)
     x = self.linear2(x)
-    x = self.relu2(x)
 
     x += identity
 
@@ -32,12 +39,12 @@ class Model(nn.Module):
   def __init__(self, output, hidden_size):
     super().__init__()
     
-    self.emb1 = nn.Embedding(4, hidden_size)
-    self.emb2 = nn.Embedding(6, hidden_size)
-    self.emb3 = nn.Embedding(7, hidden_size)
-    self.emb4 = nn.Embedding(2, hidden_size)
+    self.emb1 = nn.Embedding(len(_person_home_ownership_map), hidden_size)
+    self.emb2 = nn.Embedding(len(_loan_intent_map), hidden_size)
+    self.emb3 = nn.Embedding(len(_loan_grade_map), hidden_size)
+    self.emb4 = nn.Embedding(len(_cb_person_default_on_file_map), hidden_size)
 
-    self.num_linear = nn.Linear(7, hidden_size)
+    self.num_linear = nn.Linear(_NUMERICAL_FEATURES, hidden_size)
 
     self.block1 = Block(hidden_size)
     self.block2 = Block(hidden_size)
